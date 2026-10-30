@@ -1,0 +1,31 @@
+name: base
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # python side of FitHiChIP (src/*.py, Imp_Scripts)
+  - python
+  - numpy
+  - networkx
+  - hic-straw
+  - cooler
+  # R side (src/*.r, Analysis/*.r)
+  - r-base
+  - r-optparse
+  - r-ggplot2
+  - r-data.table
+  - r-fdrtool
+  - r-plyr
+  - r-dplyr
+  - r-rcolorbrewer
+  - bioconductor-genomicranges
+  - bioconductor-edger
+  # command line tools called by FitHiChIP_HiCPro.sh
+  - bedtools >=2.26
+  - samtools
+  - htslib
+  - ucsc-bedtobigbed
+  - macs2
+  - bc
+  - gawk
+  - gzip

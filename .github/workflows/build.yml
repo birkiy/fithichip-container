@@ -1,0 +1,79 @@
+name: Build and publish the FitHiChIP container
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/fithichip
+  FITHICHIP_VERSION: "11.0"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (load locally for the smoke test)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ${{ env.IMAGE }}:test
+          build-args: FITHICHIP_VERSION=${{ env.FITHICHIP_VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test
+        run: |
+          docker run --rm ${{ env.IMAGE }}:test bash -c '
+            set -e
+            echo "FitHiChIP: $(grep -m1 -oE "Version [0-9.]+" /opt/FitHiChIP/Release_Notes.txt)"
+            test -x /opt/FitHiChIP/FitHiChIP_HiCPro.sh
+            bedtools --version
+            samtools --version | head -1
+            bgzip --version | head -1
+            tabix --version | head -1
+            bedToBigBed 2>&1 | head -1
+            macs2 --version
+            bc --version | head -1
+            python3 -c "import numpy, networkx, hicstraw, cooler; print(\"python ok\")"
+            Rscript -e "suppressMessages({library(optparse); library(ggplot2); library(data.table); library(fdrtool); library(plyr); library(dplyr); library(RColorBrewer); library(GenomicRanges); library(edgeR); library(splines); library(parallel); library(tools)}); cat(\"R ok\n\")"
+          '
+
+      - name: Push
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ env.FITHICHIP_VERSION }}
+            ${{ env.IMAGE }}:${{ env.FITHICHIP_VERSION }}-${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          build-args: FITHICHIP_VERSION=${{ env.FITHICHIP_VERSION }}
+          cache-from: type=gha
+
+      - name: Digest
+        run: |
+          echo "Pushed ${{ env.IMAGE }}@${{ steps.push.outputs.digest }}" | tee -a "$GITHUB_STEP_SUMMARY"
+          docker run --rm ${{ env.IMAGE }}:test cat /opt/environment.lock.yml > environment.lock.yml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: environment.lock.yml
+          path: environment.lock.yml
