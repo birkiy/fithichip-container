@@ -44,6 +44,7 @@ jobs:
             set -e
             echo "FitHiChIP: $(grep -m1 -oE "Version [0-9.]+" /opt/FitHiChIP/Release_Notes.txt)"
             test -x /opt/FitHiChIP/FitHiChIP_HiCPro.sh
+            test -f /opt/FitHiChIP/interact.as
             bedtools --version
             samtools --version | head -1
             bgzip --version | head -1

@@ -22,8 +22,12 @@ RUN micromamba install -y -n base -f /tmp/environment.yml \
 
 # FitHiChIP itself, at the release tag; test data and git history left out
 RUN git clone --depth 1 --branch "${FITHICHIP_VERSION}" https://github.com/ay-lab/FitHiChIP.git /opt/FitHiChIP \
-    && rm -rf /opt/FitHiChIP/.git /opt/FitHiChIP/TestData \
-    && chmod -R a+rwX /opt/FitHiChIP
+    && rm -rf /opt/FitHiChIP/.git /opt/FitHiChIP/TestData
+
+# UCSC autoSql definition of the "interact" track: FitHiChIP_HiCPro.sh downloads it at run time when it is not
+# next to the code (and bedToBigBed, which conda provides here); shipping it keeps the image usable offline.
+COPY interact.as /opt/FitHiChIP/interact.as
+RUN chmod -R a+rwX /opt/FitHiChIP
 
 ENV MAMBA_ROOT_PREFIX=/opt/conda \
     PATH=/opt/conda/bin:/opt/FitHiChIP:$PATH \

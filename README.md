@@ -13,6 +13,7 @@ Pin it by digest in a pipeline; the digest of every build is printed in the Acti
 ## What is inside
 
 - FitHiChIP at the `11.0` release tag, in `/opt/FitHiChIP` (`FITHICHIP_HOME`), test data and git history removed, on `PATH`.
+- UCSC `interact.as` next to the FitHiChIP code (the script otherwise downloads it at run time, which fails offline).
 - Python 3 with numpy, networkx, hic-straw and cooler.
 - R with optparse, ggplot2, data.table, fdrtool, plyr, dplyr, RColorBrewer, GenomicRanges and edgeR.
 - bedtools, samtools, htslib (bgzip, tabix), UCSC bedToBigBed, MACS2, bc, gawk, gzip.
