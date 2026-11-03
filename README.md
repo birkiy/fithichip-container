@@ -18,6 +18,9 @@ Pin it by digest in a pipeline; the digest of every build is printed in the Acti
 - R with optparse, ggplot2, data.table, fdrtool, plyr, dplyr, RColorBrewer, GenomicRanges and edgeR.
 - bedtools, samtools, htslib (bgzip, tabix), UCSC bedToBigBed, MACS2, bc, gawk, gzip.
 - `/opt/environment.lock.yml`: the exact conda packages of the build (also attached to every Actions run).
+  `environment.lock.yml` in this repository is that file for the published image
+  `ghcr.io/birkiy/fithichip@sha256:ae01888ea5c881470b8e0a225c8b7ba48a9e1c40aba6e984c61c87d3222b16d3`;
+  `environment.yml` lists the packages without versions, so a rebuild resolves the current ones.
 
 HiC-Pro is **not** included. FitHiChIP needs it only to build the contact matrix from a HiC-Pro validPairs file; give it
 the bins and matrix instead (`Interval=` and `Matrix=`, e.g. from `cooler dump`), a `.cool`/`.mcool` (`COOL=`), a `.hic`
